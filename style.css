@@ -1,0 +1,50 @@
+*{
+	font-family: sans-serif;
+	color: #fff;
+}
+
+body{
+	background-color: #000;
+}
+
+.widget{
+	background-color: rgba(255, 255, 255, 0.1);
+	border-radius: 0.7em;
+	margin: 1em;
+}
+
+.widget .header, .content{
+	padding: 0.5em 1em;
+}
+
+.widget .header{
+	background-color: rgba(255, 255, 255, 0.2);
+	border-radius: 0.7em 0.7em 0 0;
+}
+
+.clock, .weather{
+	width: 15em;
+}
+
+/*Video / posenet */
+canvas{
+	/*spiegel input*/
+	-moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+    width: 100vw;
+	height: 100vh;
+}
+
+video{
+	filter: brightness(0%);
+}
+
+#defaultCanvas0{
+	width: 100vw;
+	height: 100vh;
+	background-color: #000;
+}
