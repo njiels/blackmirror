@@ -8,7 +8,7 @@
 ml5 Example
 PoseNet example using p5.js
 === */
-//below some variables that will later be used by ML5js are being called.
+
 let video;
 let poseNet;
 let poses = [];
@@ -28,20 +28,28 @@ let leftEyeY = 0;
 let rightEyeX = 0;
 let rightEyeY = 0;
 
-//Here are the precalcalculations called to estimate screensize, and just general pose and interaction variables
+//screen
 var screenWidth = window.innerWidth;
 var screenHeight = window.innerHeight;
-var distanceEyes, distanceFace, distancePointLeft, distancePointRight, reactDistance,
+var webcamHeight= screenWidth * 0.5625;
+var distanceEyes, distanceFace, distance, distanceVS, distancePointLeft, distancePointRight, reactDistance,
 nose, hand, hand2, wrist, wrist2, leftHandXEst, leftHandYEst, laptopEst, mirrorEst,
 virtualScreenWidth, virtualScreenHeight, gridHeight, gridWidth, gridX, gridY;
+var screen = "onboarding";
 
-//presets for the grid and animation trigger
+//Get position of 
+var offsets = document.getElementById('testwidget').getBoundingClientRect();
+var topOffset = offsets.top;
+var leftOffset = offsets.left;
+
+var mirror = screenWidth - leftOffset;
+
+//Graphics of ...
 var responseGrid = [];
 var played = false;
 
-console.log('this application runs on ML5 version:', ml5.version);
+console.log('ml5 version:', ml5.version);
 
-//Sets up some variables for ML5js to use, like webcam input
 function setup() {
     var canvas = createCanvas(screenWidth, screenHeight);
     canvas.parent('canvascontainer');
@@ -49,6 +57,7 @@ function setup() {
     
     video.position(0,-200);
     video.size(width, height);
+    //translate(width,0); // move to far corner
 
     // Create a new poseNet method with a single detection
     poseNet = ml5.poseNet(video, modelReady);
@@ -58,7 +67,7 @@ function setup() {
     // Hide the video element, and just show the canvas
     video.hide();
 
-    //Calculate a fitting grid for the full screen
+    //Grid
     for(var i = 0; i < columns; i++){
         responseGrid[i] = []
         for(var j = 0; j < rows; j++){
@@ -70,12 +79,15 @@ function setup() {
     }
 }
 
-//NOTE TO SELF: Should this be deleted? it is still called in line 54 tho...
 function modelReady() {
 }
 
+function getStartTime(){
+    getTime();
+}
+
 function gotPoses(poses){
-    //Assigns variables to pose data. NOTE TO SELF: how can this be written for multiple users?
+    // console.log(poses);
     if (poses.length > 0) {
     rightHandX = (poses[0].pose.keypoints[10].position.x);
     rightHandY = (poses[0].pose.keypoints[10].position.y);
@@ -99,29 +111,37 @@ function gotPoses(poses){
 }
 
 function calculate(){
-    //hand estimation for LAPTOP screenSize or MIRROR... not responsive yet!
+//hand estimation for LAPTOP or MIRROR   
     laptopEst = 370;
-    mirrorEst = (screenHeight*(distanceEyes/100));//NOTE TO SELF: these should be influenced by the position of handY's ONLY WORKS FOR LEFT HAND NOW
+    mirrorEst = 600;
+    // if((leftHandY-leftElbowY)<=0){
+    //     mirrorEst = 600;
+    // }else{
+    //     mirrorEst = -300;
+    // }
     
     leftHandXEstimation = (leftHandX + distancePointLeft);
-    leftHandYEstimation = ((leftHandY*2) - mirrorEst);
+    leftHandYEstimation = (leftHandY- mirrorEst);
+
     rightHandXEstimation = (rightHandX + distancePointRight);
     rightHandYEstimation = (rightHandY - mirrorEst);
-    //these lines estimate the way user points. NOTE TO SELF: could use some tweaking!
+
     distancePointLeft = (leftHandX  - leftElbowX);
     distancePointRight = (rightHandX  - rightElbowX);
 
     distanceEyes = int(dist(leftEyeX, leftEyeY, rightEyeX, rightEyeY));
-    distanceFace = int(dist(leftEyeX, leftEyeY, noseX, rightEyeX, rightEyeY, noseY));//NOTE TO SELF: stille necessary?
-    
-    fill(0,0,255,50);
-    hand = ellipse(leftHandXEstimation, leftHandYEstimation, (2*distanceEyes), (2*distanceEyes));
-    // NOTE TO SELF: below right hand is commented, but can be used later. Could use some improvement. (same with wrist2)
-    // fill(255,0,0);
-    // hand2 = ellipse(rightHandXEstimation, rightHandYEstimation, 20, 20);
+    distanceFace = int(dist(leftEyeX, leftEyeY, noseX, rightEyeX, rightEyeY, noseY));
 
-    wrist = ellipse(leftHandX, leftHandY, 10, 10);
-    //wrist2 = ellipse(rightHandX, rightHandY, 10, 10);
+    distanceVS = 1 * distanceEyes;
+    distance = 5.5 * distanceEyes;
+    
+    fill(0,0,255);
+    hand = ellipse(leftHandXEstimation, leftHandYEstimation, 20, 20);
+    fill(255,0,0);
+    hand2 = ellipse(rightHandXEstimation, rightHandYEstimation, 20, 20);
+    //hand2 = ellipse((leftHandX), (leftHandY), 20, 20);
+    wrist = ellipse(leftElbowX, leftElbowY, 10, 10);
+    wrist2 = ellipse(rightHandX, rightHandY, 10, 10);
 
     fill(255,255,255);
     nose = ellipse(noseX, noseY, 30, 30);
@@ -129,10 +149,10 @@ function calculate(){
     virtualSize = 0.002 * distanceEyes;
     virtualScreenWidth = virtualSize * screenWidth;
     virtualScreenHeight = virtualSize * screenHeight;
+    //console.log(distancePointLeft);
 }
 
 function drawgraphics(){
-    //Here the grid is being drawn.
     for(var i = 0; i < rows; i++){
         for(var j = 0; j < columns; j++){
             gridX = i * dotWidth;
@@ -144,24 +164,48 @@ function drawgraphics(){
     }
 }
 
-//function draw is a P5 loop that updates the canvas. It is in this function where the poses are estimated, because a new image is being drawn from the input of the webcam.
+function selectControls(){
+    reactDistance = dist(leftHandXEstimation, leftHandYEstimation, mirror, topOffset); 
+    //Draw a mirror button on screen
+    fill(255)
+    rect(mirror,topOffset, -200, 200);
+    // console.log(reactDistance)
+    
+    if(reactDistance <= 350){
+        textSelect.play();
+        //played = true;
+        console.log('CLICK');
+    }else{
+        //played = false;
+    }
+}
+
+function triggerBox(){
+    //Identifies triggers by determing the distance between hand and certain points in screen
+}
+
 function draw() {
     clear();
+    //translate(width,0); // move to far corner
+    //scale(-1.0,1.0);    // flip x-axis backwards
+
     image(video, 0, 0, width, height);
     calculate();
 
-    //NOTE TO SELF: background(0) seems to stopped working. Fix this ASAP for testing!
+    //translate(width,0); // move to far corner
+    //scale(-1.0,1.0);    // flip x-axis backwards
     //background(0);
 
-    //code below triggers the functionality if users are nearby enough, so users from faraway cannot influence the mirror.
     if (distanceEyes > 50 && distanceEyes < 150){
         drawgraphics();
+        selectControls();
         if (!played){
+            hiAnimation.play();
             played = true;
         }
     }else{
         played = false;
     }
-    //console log commented for eventual use
-    // console.log(distanceEyes);
 }
+    
+console.log("left: " + leftOffset + " top: " + topOffset + "Conf");
