@@ -31,10 +31,15 @@ let conditionNoseX = 0;
 let conditionNoseY = 0;
 let nodNo = 0;
 let nodYes = 0;
+let screen = 0;
 
+// U I 
 //Here are the precalcalculations called to estimate screensize, and just general pose and interaction variables
 var screenWidth = window.innerWidth;
 var screenHeight = window.innerHeight;
+
+var speechBubble = document.getElementById('speechBubble');
+var explainContainer = document.getElementsByClassName('explaincontainer');
 //initialisation of variables
 var distanceEyes, distanceFace, distancePointLeft, distancePointRight, reactDistance,
 nose, hand, hand2, wrist, wrist2, leftHandXEst, leftHandYEst, laptopEst, mirrorEst,
@@ -65,10 +70,22 @@ function setup() {
     poseNet.on('pose', gotPoses);
     // Hide the video element, and just show the canvas
     video.hide();
+
+    //Calculate a fitting grid for the full screen
+    for(var i = 0; i < columns; i++){
+        responseGrid[i] = []
+        for(var j = 0; j < rows; j++){
+            responseGrid[i][j] = [];
+
+            gridX = i * dotWidth;
+            gridY = j * dotWidth;
+        }
+    }
 }
 
 //NOTE TO SELF: Should this be deleted? it is still called in line 54 tho...
 function modelReady() {
+    console.log("Posenet loaded")
 }
 
 function gotPoses(poses){
@@ -125,10 +142,9 @@ function calculate(){
     virtualScreenWidth = virtualSize * screenWidth;
     virtualScreenHeight = virtualSize * screenHeight;
 }
-
+//G E S T U R E    F U N C T I O N S
 //creating reference points for gestures
 function startPoint(){
-    //calculate starting points
     conditionNoseX = noseX;
     conditionNoseY = noseY;
 
@@ -151,77 +167,111 @@ function resetGesture(){
 }
 setInterval(resetGesture, 2000);
 
-//NODDING (Y/N) gestures
-function nodRec(){
-    document.getElementById('metaNoseX').innerHTML = conditionNoseX;
-    document.getElementById('metaNoseY').innerHTML = conditionNoseY;
+//Animations after gesture
+function gestureAnime(){
+    //Trigger gesture (verplaatst deze wellicht naar nodrec() )
+    if(gesture == 'n'){
+        noddingN.play();
+        
+        if screen == 1{
+            screen = 2;
+        }
 
-    document.getElementById('metaNoseDist').innerHTML = differenceNoseX + " , " + differenceNoseY;
-    document.getElementById('metaDistEyes').innerHTML = distanceEyes;
-    
+        if screen == 2{
+            screen = 3;
+        }
 
-    
+        if screen == 3{
+            screen = 4;
+        }
+    }
+    if(gesture == 'y'){
+        noddingY.play();   
+    }
+}
+
+//NODDING
+function nodRec(){ 
     differenceNoseY = Math.abs(conditionNoseY-noseY);
-    differenceNoseY = Math.abs(conditionNoseX-noseX);
-
+    differenceNoseX = Math.abs(conditionNoseX-noseX);
     if(!conditionNoseX){
-        (document.getElementById('metaGesture').innerHTML = "loading...")
+        console.log('no stuff to work with!');
     }else{
+        // console.log('searching for nods');
         //YES
-        if (differenceNoseY >= (distanceEyes/4)){
-            (document.getElementById('metaGesture').innerHTML = "is that a...");
+        if (differenceNoseY >= (distanceEyes/4)){//was /4
             nodYes = 1;
+            console.log('step one Y');
         }
         if (differenceNoseY >= 150){
             nodYes == 0;
-            (document.getElementById('metaGesture').innerHTML = "");
         }
         if (nodYes == 1){
-            if(differenceNoseY <= 25){
+            if(differenceNoseY <= 50){
                 nodYes = 2;
+                gesture = 'y';
             }
         }
         if (nodYes == 2){
-            setTimeout((document.getElementById('metaGesture').innerHTML = "You nodded YES!"), 3000);
             console.log("I saw a Yes ", nodYes);
         }
-
         //NO 50
-        if (differenceNoseX >= (distanceEyes/2)){
-            (document.getElementById('metaGesture').innerHTML = "are you about to...");
+        if (differenceNoseX >= (distanceEyes/2)){//was /2
             nodNo = 1;
+            console.log('step one N');
+
         }
         if (differenceNoseX >= 150){
             nodNo == 0;
-            (document.getElementById('metaGesture').innerHTML = "");
         }
         if (nodNo == 1){
             if(differenceNoseX <= 25){
                 nodNo = 2;
+                gesture = 'n';
             }
         }
         if (nodNo == 2){
-            setTimeout((document.getElementById('metaGesture').innerHTML = "You nodded NO!"), 3000);
             console.log("I saw a NO ", nodNo);
         }
     }
 }
 
-//SWIPING gestures
-function swipeRec(){
-    differenceLHandX = conditionLHandX - leftHandXEstimation;
-    differenceLHandY = conditionLHandY - leftHandYEstimation;
-    differenceRHandY = conditionRHandY - rightHandYEstimation;
-    differenceRHandX = conditionRHandX - rightHandXEstimation;
-    
-    if(differenceLHandX >= 100 || differenceRHandX >= 100){
-        setTimeout((document.getElementById('metaGesture').innerHTML = "You swiped RIGHT!"), 1000);
-        gesture = 'swipeR';
-    } else if(differenceLHandX <= -100 || differenceRHandX <= -100){
-        setTimeout((document.getElementById('metaGesture').innerHTML = "You swiped LEFT!"), 1000);
-        gesture = 'swipeL';
-    }else{
-        document.getElementById('metaGesture').innerHTML = ""
+function scenario(){
+    if(screen == 0){
+        speechBubble.classList.add('hide');
+        // explainContainer.classList.add('hide');
+    }
+    if(screen == 1){
+        speechBubble.classList.remove('hide');
+        speechBubble.innerHTML = "Hey.. Is that you Frank?";
+    }
+//no answers
+    if(screen == 2){
+        speechBubble.classList.remove('hide');
+        speechBubble.innerHTML = "You gotta be kidding... You look like him!";
+    }
+
+    if(screen == 3){
+        speechBubble.classList.remove('hide');
+        speechBubble.innerHTML = "Anyway, you've got a invitation for a meeting next friday. Do you want me to accept?";
+    }
+
+    if(screen == 4){
+        speechBubble.classList.remove('hide');
+        speechBubble.innerHTML = "Too late, You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
+    }
+//yes answers
+    if(screen == 5){
+        speechBubble.classList.remove('hide');
+        speechBubble.innerHTML = "Great! You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
+    }
+    if(screen == 5){
+        speechBubble.classList.remove('hide');
+        speechBubble.innerHTML = "Great! You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
+    }
+    if(screen == 5){
+        speechBubble.classList.remove('hide');
+        speechBubble.innerHTML = "Great! You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
     }
 }
 
@@ -231,25 +281,29 @@ function draw() {
     image(video, 0, 0, width, height);
     calculate();
 
-    //NOTE TO SELF: background(0) seems to stopped working. Fix this ASAP for testing!
-    background(0, 0, 0, 0.9);
-
-    fill(150, 0, 0)
     rect(conditionNoseX, conditionNoseY, 20, 20);
     rect(conditionLHandX, conditionLHandY, 20, 20);
     rect(conditionRHandX, conditionRHandY, 20, 20);
 
-    nodRec();
+    //NOTE TO SELF: background(0) seems to stopped working. Fix this ASAP for testing!
+    // background(0);
 
     //code below triggers the functionality if users are nearby enough, so users from faraway cannot influence the mirror.
     if (distanceEyes > 50 && distanceEyes < 150){
+        drawGrid();
+        nodRec();
+        gestureAnime();
+        scenario();
+        screen = 1;
         if (!played){
+            hiAnimation.play();
             played = true;
         }
     }else{
         played = false;
     }
     //console log commented for eventual use
-    // console.log("Y: " + nodYes);
-    // console.log("N: " + nodNo);
+    if (gesture != null){
+        console.log(gesture);
+    }
 }

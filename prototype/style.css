@@ -1,0 +1,124 @@
+*{
+	color: #fff;
+}
+
+body{
+    margin: 0;
+    background-color: #000;
+    font-family: 'Archivo Black', sans-serif;
+    max-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    /*display: flex;
+    justify-content: space-around;*/
+}
+
+canvas{
+	/*spiegel input*/
+	-moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.dots-layout{
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    z-index: 5;
+    /*justify-content: space-around;*/
+}
+
+.dot{
+    width: 5em;
+    height: 5em;
+    border-radius: 50%;
+    border: 5px #000 solid;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-color: #fff;
+    margin: 0;
+    opacity: 1;
+}
+
+/* infor container */
+.infocontainer{
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+}
+
+.widget{
+    border-radius: 2.5rem;
+    border: 5px #000 solid;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-color: #fff;
+    color: #000;
+    min-height: 10rem;
+    min-width: 10rem;
+    padding: 1.6rem;
+    align-self: flex-start;
+}
+
+.widget * {
+    color: #000
+}
+
+.speechbubble{
+    font-size: 3em;
+    margin-top: 10rem;
+    width: 100%;
+    height: 20rem;
+}
+
+.explaincontainer{
+    display: flex;
+    justify-content: center;
+}
+
+.explainbubble{
+    background: #000;
+    margin: 5em;
+    text-align: center;
+    z-index: 10;
+    width: 15em;
+    height: 15em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.explainbubble img{
+    width: 80%;
+    max-height: 70%;
+}
+
+.explainbubble > .widget{
+    border-radius: 50%;
+    width: 15em;
+    height: 15em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/*Interaction*/
+.hide{
+    opacity: 0;
+}
+
+.focus{
+    font-size: 2rem;
+}
+
+/*canvas/ml5 interaction*/
+#canvascontainer{
+    position: absolute;
+    z-index: 0;
+}

@@ -58,12 +58,13 @@ var textPopUp = {
   targets: '.widget',
   scale: [
     {value: 1, easing: 'easeOutSine', duration: 100},
-    {value: 1.1, easing: 'easeInOutQuad', duration: 200},
+    {value: 0.9, easing: 'easeInOutQuad', duration: 200},
     {value: 1, easing: 'easeInOutQuad', duration: 200}
   ],
   opacity: [
     {value: 1, easing: 'easeInOutQuad', duration: 50}
-  ]
+  ],
+  duration: 1000,
 };
 
 var gridFade = {
@@ -72,6 +73,26 @@ var gridFade = {
   opacity: [
     {value: 1, duration: 500},
     {value: 0, easing: 'easeInOutSine', duration: 200}
+  ],
+};
+
+var targetYes ={
+  targets: '#yes',
+  easing: 'easeInOutSine',
+  loop: 2,
+  scale: [
+    {value: 1, duration: 500},
+    {value: 0.8, duration: 500}
+  ],
+};
+
+var targetNo ={
+  targets: '#no',
+  easing: 'easeInOutSine',
+  loop: 2,
+  scale: [
+    {value: 1, duration: 500},
+    {value: 0.8, duration: 500}
   ],
 };
 
@@ -89,10 +110,13 @@ const timeline = anime.timeline({
       autoplay: false
   })
 
-  const swipeRight = anime.timeline({
+  const noddingY = anime.timeline({
     autoplay: false
 })
-  
+
+  const noddingN = anime.timeline({
+    autoplay: false
+  })
   
 timeline.add(textPopUp)
     .add(gridFade);
@@ -103,4 +127,5 @@ hiAnimation.add(rippleMiddle)
 
 textSelect.add(textPopUp);
 
-swipeRight.add(rippleEdge);
+noddingY.add(targetYes);
+noddingN.add(targetNo);
