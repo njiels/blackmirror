@@ -173,15 +173,15 @@ function gestureAnime(){
     if(gesture == 'n'){
         noddingN.play();
         
-        if screen == 1{
+        if (screen == 1){
             screen = 2;
         }
 
-        if screen == 2{
+        if (screen == 2){
             screen = 3;
         }
 
-        if screen == 3{
+        if (screen == 3){
             screen = 4;
         }
     }
