@@ -71,7 +71,7 @@ function setup() {
     // Hide the video element, and just show the canvas
     video.hide();
 
-    //Calculate a fitting grid for the full screen
+    // Calculate a fitting grid for the full screen
     for(var i = 0; i < columns; i++){
         responseGrid[i] = []
         for(var j = 0; j < rows; j++){
@@ -170,27 +170,15 @@ setInterval(resetGesture, 2000);
 //Animations after gesture
 function gestureAnime(){
     //Trigger gesture (verplaatst deze wellicht naar nodrec() )
-    if(gesture == 'n'){
-        noddingN.play();
-        
-        if (screen == 1){
-            screen = 2;
-        }
+    
+}
 
-        if (screen == 2){
-            screen = 3;
-        }
-
-        if (screen == 3){
-            screen = 4;
-        }
-    }
-    if(gesture == 'y'){
-        noddingY.play();   
-    }
+function resetNod(){
+    gesture == null;
 }
 
 //NODDING
+//NOTE: unfortunately this doesn't work wel enough
 function nodRec(){ 
     differenceNoseY = Math.abs(conditionNoseY-noseY);
     differenceNoseX = Math.abs(conditionNoseX-noseX);
@@ -234,6 +222,23 @@ function nodRec(){
             console.log("I saw a NO ", nodNo);
         }
     }
+
+    if(gesture == 'n'){
+        noddingN.play();
+        resetNod();
+    }
+    if (screen == 1 && gesture == 'n'){
+        setTimeout(screen = 2, 2000);
+    }
+
+    if(gesture == 'y'){
+        noddingY.play(); 
+        resetNod();
+    }
+    if (screen == 1 && gesture == 'y'){
+        setTimeout(2000);
+        screen=3;
+    }
 }
 
 function scenario(){
@@ -248,30 +253,13 @@ function scenario(){
 //no answers
     if(screen == 2){
         speechBubble.classList.remove('hide');
-        speechBubble.innerHTML = "You gotta be kidding... You look like him!";
+        speechBubble.innerHTML = "Too bad, You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
     }
 
+//yes answers
     if(screen == 3){
         speechBubble.classList.remove('hide');
-        speechBubble.innerHTML = "Anyway, you've got a invitation for a meeting next friday. Do you want me to accept?";
-    }
-
-    if(screen == 4){
-        speechBubble.classList.remove('hide');
-        speechBubble.innerHTML = "Too late, You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
-    }
-//yes answers
-    if(screen == 5){
-        speechBubble.classList.remove('hide');
-        speechBubble.innerHTML = "Great! You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
-    }
-    if(screen == 5){
-        speechBubble.classList.remove('hide');
-        speechBubble.innerHTML = "Great! You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
-    }
-    if(screen == 5){
-        speechBubble.classList.remove('hide');
-        speechBubble.innerHTML = "Great! You are expected in Leuven next Friday at 12:00. Have a good day Frank!";
+        speechBubble.innerHTML = "Great! You are expected in Leuven next Friday at 12:00. Is that possible?";
     }
 }
 
@@ -286,7 +274,7 @@ function draw() {
     rect(conditionRHandX, conditionRHandY, 20, 20);
 
     //NOTE TO SELF: background(0) seems to stopped working. Fix this ASAP for testing!
-    // background(0);
+    background(0);
 
     //code below triggers the functionality if users are nearby enough, so users from faraway cannot influence the mirror.
     if (distanceEyes > 50 && distanceEyes < 150){
